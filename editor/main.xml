@@ -1,4 +1,4 @@
 <?xml version="1.0"?>
-<game name="Example Mod" version="1.0" description="This is a template for RedCore">
+<game name="PropelParts U" version="1.0" description="PropelParts Actors for NSMBU!">
     <file name="spritedata" path="spritedata.xml" />
 </game>

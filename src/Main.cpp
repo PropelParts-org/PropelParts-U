@@ -1,11 +1,11 @@
 #include <telkin/Print.h>
-#include <example/ExampleMod.h>
+#include <propelpartsu/PropelPartsU.h>
 
-red::Registrar* example::getRegistrar() {
-    static red::Registrar sRegistrar("examplemod");
+red::Registrar* propelpartsu::getRegistrar() {
+    static red::Registrar sRegistrar("propelpartsu");
     return &sRegistrar;
 }
 
 void main() {
-    tk::println("Welcome to Example Mod");
+    tk::println("PropelParts U - Actors by Ryguy0777");
 }

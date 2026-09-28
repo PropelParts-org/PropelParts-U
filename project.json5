@@ -1,10 +1,10 @@
 {
     WURPLSVersion: "1.0",
     
-    Name: "ExampleMod",
+    Name: "PropelParts U",
     Type: "Standard",
     Version: "1.0.0",
-    Description: "This is the RedCore example mod!",
+    Description: "PropelParts actors for NSMBU!",
     
     SourceDirs: [
         "src"

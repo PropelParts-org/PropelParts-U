@@ -1,3 +1,25 @@
 @addresses_from "00050000-10101D00" // US v1.3.0 (v64)
 
 // If your mod uses symbols that aren't in RedCore, you can add them here.
+    _ZN4Mtxf5YrotMERK5Angle = 0x029E14C4;
+    _ZN4Mtxf5XrotMERK5Angle = 0x029E1594;
+    _ZN4Mtxf5ZrotMERK5Angle = 0x029E152C;
+    _ZN11ProfileInfo17cProfileID_MarutaE = 0x100040CC;
+    _ZN15JointBlendModel6setAnmERKN4sead14SafeStringBaseIcEEN9FrameCtrl8PlayModeEff = 0x024DFFB4;
+    _ZN30ActorCollisionDrcTouchCallback16ccSetTouchDamageEP19ActorCollisionCheckRKN4sead7Vector2IfEE = 0x0219E7E8;
+    _ZN30ActorCollisionDrcTouchCallback16bcSetTouchDamageEP11BgCollisionRKN4sead7Vector2IfEE = 0x0219E8B8;
+    _ZN30ActorCollisionDrcTouchCallback9bcOnTouchEP11BgCollisionRKN4sead7Vector2IfEE = 0x0219E974;
+    _ZN30ActorCollisionDrcTouchCallback9ccOnTouchEP19ActorCollisionCheckRKN4sead7Vector2IfEE = 0x0219E8A4;
+    _ZN12EnemyBoyoMgr11cDeltaScaleE = 0x10200DF0;
+    _ZN12EnemyBoyoMgr5beginEif = 0x0232A940;
+    _ZTV12EnemyBoyoMgr = 0x10072588;
+    _ZN12EnemyBoyoMgr7executeEv = 0x0232A958;
+    _ZN5Actor11calcSpeedX_Ev = 0x020013E8;
+    _ZN21ActorBgCollisionCheck7checkBgEv = 0x0218D954;
+    _ZNK22ActorCollisionCheckMgr14isInActiveListERK19ActorCollisionCheck = 0x0219DC5C;
+    _ZNK22ActorCollisionCheckMgr14isInCreateListERK19ActorCollisionCheck = 0x0219DD88;
+    _ZN22ActorCollisionCheckMgr15addToCreateListERK19ActorCollisionCheck = 0x0219E028;
+    _ZN22ActorCollisionCheckMgr20removeFromActiveListERK19ActorCollisionCheck = 0x0219DF70;
+    _ZN22ActorCollisionCheckMgr20removeFromCreateListERK19ActorCollisionCheck = 0x0219DDC4;
+    _ZN22ActorCollisionCheckMgr26removeFromTouchDrcHoldListERK19ActorCollisionCheck = 0x0219E130;
+    _ZN5Enemy17setDeathInfo_FallE7DirTypeiN8ScoreMgr9ScoreTypeE = 0x0232CBA4;

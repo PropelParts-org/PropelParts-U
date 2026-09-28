@@ -2,12 +2,12 @@
   "WURPLSLockfileVersion": "1.0",
   "DirectDependencies": {
     "RedCore": {
-      "Source": "zenith-team/redcore",
-      "Version": "^1.0.2",
+      "Source": "D:\\GitHub\\RedCore",
+      "Version": "*",
       "Dependencies": {
         "Telkin": {
           "Source": "zenith-team/telkin",
-          "Version": "1.0.8",
+          "Version": "^1.0.11",
           "Dependencies": {}
         }
       }
@@ -15,9 +15,9 @@
   },
   "ResolvedDependencies": {
     "RedCore": {
-      "Current": "1.0.2",
-      "Source": "https://github.com/zenith-team/redcore/releases/download/1.0.2/package.zip",
-      "Hash": "1c5fc9f2d4cabd11b1f17a06f14f88c0fe79eb592d41cb4dff6d8ea65a7cfe6e",
+      "Current": "2.0.0",
+      "Source": "D:\\GitHub\\RedCore",
+      "Hash": "0",
       "IncludeDirs": [
         ".tachyon/packages/RedCore/include",
         ".tachyon/packages/RedCore/libs/headers",
@@ -35,9 +35,9 @@
       ]
     },
     "Telkin": {
-      "Current": "1.0.8",
-      "Source": "https://github.com/zenith-team/telkin/releases/download/1.0.8/package.zip",
-      "Hash": "251462a139c9d5139c0c74406fd439804bc1428672bd4c4a6b6b9eab35158457",
+      "Current": "1.0.11",
+      "Source": "https://github.com/zenith-team/telkin/releases/download/1.0.11/package.zip",
+      "Hash": "117286112eba930f4a69f381e6254db8377c8a342bd39c917347c6556b96f3ca",
       "IncludeDirs": [
         ".tachyon/packages/Telkin/include",
         ".tachyon/packages/Telkin/libs/DynamicLibs/dynamic_libs/include",

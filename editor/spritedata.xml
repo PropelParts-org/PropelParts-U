@@ -1,6 +1,27 @@
 <?xml version="1.0"?>
 <sprites>
-	<sprite string_id="examplemod:demo" name="Demo Actor">
-        <!-- Settings go here -->
-	</sprite>
+  <sprite string_id="propelpartsu:heiho" name="Shy Guy">
+	<list nybble="5" title="Type" comment="Types greater than 4 spawn Shy Guys that won't move.">
+      <entry value="0">Walker (Walks Off Ledges)</entry>
+      <entry value="1">Walker (Turns Around At Ledges)</entry>
+      <entry value="2">Sleeper</entry>
+      <entry value="3">Jumper</entry>
+      <entry value="4">Pacer</entry>
+    </list>
+    <list nybble="6" title="Color" comment2="While you can set Shy Guys to any color, it is recommended to keep Shy Guy types and colors consistent.">
+	  <entry value="0">Red</entry>
+      <entry value="1">Pink</entry>
+      <entry value="2">Yellow</entry>
+      <entry value="3">Blue</entry>
+      <entry value="4">Green</entry>
+      <entry value="5">Black</entry>
+      <entry value="6">White</entry>
+      <entry value="7">Light Blue</entry>
+      <entry value="8">Orange</entry>
+      <entry value="9">Purple</entry>
+    </list>
+	<checkbox nybble="8" mask="2" title="Dies in 2 Stomps" comment="When enabled, this causes the Shy Guy to die in 2 stomps instead of 1." comment2="It is recommended to keep this consistent across Shy Guy variants."/>
+    <value nybble="9" title="Distance" comment="The distance the Shy Guy will walk in each direction. The Shy Guy will ignore ledges." requirednybble="5" requiredval="4"/>
+    <dualbox bit="40" title1="Spawns Left" title2="Spawns Right" requirednybble="5" requiredval="3-4"/>
+  </sprite>
 </sprites>

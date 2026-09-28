@@ -2,7 +2,7 @@
 
 #include <red/registry/Registrar.h>
 
-namespace example {
+namespace propelpartsu {
     
     red::Registrar* getRegistrar();
     
