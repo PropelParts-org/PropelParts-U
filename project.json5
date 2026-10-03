@@ -1,7 +1,7 @@
 {
     WURPLSVersion: "1.0",
     
-    Name: "PropelParts U",
+    Name: "PropelParts-U",
     Type: "Standard",
     Version: "1.0.0",
     Description: "PropelParts actors for NSMBU!",

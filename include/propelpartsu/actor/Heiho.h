@@ -1,6 +1,5 @@
 #pragma once
 
-#include "enemy/EnemyBoyoMgr.h"
 #include <enemy/Enemy.h>
 #include <actor/Profile.h>
 #include <collision/ActorCollisionDrcTouchCallback.h>
@@ -8,6 +7,12 @@
 #include <enemy/EnemyEatData.h>
 #include <enemy/EnemyChibiYoshiEatData.h>
 #include <effect/EffectObj.h>
+#include <enemy/EnemyBoyoMgr.h>
+
+/*************************************************************************
+            Port of PropelParts's Shyguy Actor to NSMBU
+            Heiho is Shyguy in Japanese, hence the class name
+*************************************************************************/
 
 namespace propelpartsu {
 
@@ -39,6 +44,8 @@ public:
 
     void removeCollisionCheck() override;
     void reviveCollisionCheck() override;
+
+    void allEnemyDeathEffSet() override;
 
     bool setDamage(ActorCollisionCheck* cc_self, ActorCollisionCheck* cc_other) override;
 
@@ -75,6 +82,9 @@ public:
 
     void setWalkSpeed();
     bool checkLedge();
+    void landonEffect();
+    u8 checkBgIn();
+    void setDeathInfo_Hasami();
 
     static const ActorCreateInfo cCreateInfo;
     static const ActorCollisionCheck::CollisionData cCollisionData;
@@ -108,6 +118,7 @@ private:
 	f32 mBaseline;
     f32 mFinalPos[2];
     u32 mJumpCounter;
+    bool mHasLanded;
 
     HeihoType mType;
     u8 mColor;

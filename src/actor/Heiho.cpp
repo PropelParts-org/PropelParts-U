@@ -22,6 +22,7 @@ CREATE_STATE_ID(Heiho, Touch)
 Profile* Heiho::sProfile = getRegistrar()->newProfile<Heiho>("heiho")
     .resources<"heiho">(ProfileInfo::cResType_Course)
     .createInfo(cCreateInfo)
+    .flag(Profile::cFlag_DrawCullCheck | Profile::cFlag_WinKill)
     .build();
 
 // Create parameters
@@ -81,6 +82,7 @@ bool Heiho::DrcTouchCB::ccSetTouchNormal(ActorCollisionCheck* cc, const sead::Ve
     return true;
 }
 
+// Class constants
 const f32 Heiho::cMaxSpeedX = 1.0f;
 const f32 Heiho::cMaxSpeedY = -4.0f;
 
@@ -101,18 +103,19 @@ Heiho::Heiho(const ActorCreateParam& param)
     , mTimer(0)
     , mBaseline(0.0f)
     , mJumpCounter(0)
+    , mHasLanded(true)
 { }
 
 ActorBase::Result Heiho::create() {
-    // Model setp
+    // Model setup
     setupModel();
 
     // Set max speed for gravity
     mSpeedMax.y = cMaxSpeedY;
 
     // Set collider
-    mCollisionCheck.set(this, Heiho::cCollisionData);
-    mCollisionCheckDrcTouch.set(this, Heiho::cCollisionData_DRC);
+    mCollisionCheck.set(this, cCollisionData);
+    mCollisionCheckDrcTouch.set(this, cCollisionData_DRC, &mDrcTouchCallback);
     reviveCollisionCheck();
 
     // Assign parameters
@@ -139,6 +142,7 @@ ActorBase::Result Heiho::create() {
 
     // Tile sensors
     mBgCheckObj.set(this, &cBcSensorFoot, &cBcSensorHead, &cBcSensorWall);
+    bgCheck_();
 
     // Yoshi eat ability
     mEatDataPtr = &mYoshiEatData;
@@ -147,9 +151,6 @@ ActorBase::Result Heiho::create() {
     // Baby Yoshi eat ability
     mChibiYoshiEatDataPtr = &mBabyYoshiEatData;
     mBabyYoshiEatData.setEatType(ChibiYoshiEatData::cEatType_Drink);
-
-    // Gamepad touch
-    mCollisionCheckDrcTouch.setDrcTouchCallback(&mDrcTouchCallback);
 
     // Set spawn direction
     DirType direction;
@@ -160,6 +161,10 @@ ActorBase::Result Heiho::create() {
     }
     mDirection = direction;
     mAngle.y() = cBaseAngleY[mDirection];
+
+    // Water check
+    mCheckWaterNeeded = true;
+    mWaterCalcType = cWaterCalcType_EnablePreCheck;
 
     // Set starting state
     setInitialState();
@@ -172,6 +177,14 @@ ActorBase::Result Heiho::create() {
 bool Heiho::execute() {
     // Update boyon
     mBoyoMgr.execute();
+
+    // Play effect if landing on the ground
+    landonEffect();
+
+    // Kill if crushed
+    if (hasamareBgCheck_() || checkBgIn()) {
+        setDeathInfo_Hasami();
+    }
 
     executeState();
     calcMdl_Normal();
@@ -197,6 +210,13 @@ void Heiho::reviveCollisionCheck() {
 void Heiho::removeCollisionCheck() {
     ActorCollisionCheckMgr::instance()->release(mCollisionCheck);
     ActorCollisionCheckMgr::instance()->release(mCollisionCheckDrcTouch);
+}
+
+// Play death effect when dying to the goal pole
+void Heiho::allEnemyDeathEffSet() {
+    sead::Vector3f effectPos;
+    effectPos.setAdd(mPos, mCenterOffset);
+    EffectCreateUtil::createEffect(RP_Cmn_EnemyBurst_00, &effectPos);
 }
 
 // If the Shyguy is facing opposite of the player on contact, flip the shyguy
@@ -268,8 +288,7 @@ void Heiho::vsYoshiHitCheck_Normal(ActorCollisionCheck* cc_self, ActorCollisionC
 }
 
 // Treat colliding with baby yoshis as colliding with a normal actor
-void Heiho::vsChibiYoshiHitCheck_Normal(ActorCollisionCheck* cc_self, ActorCollisionCheck* cc_other)
-{
+void Heiho::vsChibiYoshiHitCheck_Normal(ActorCollisionCheck* cc_self, ActorCollisionCheck* cc_other) {
     vsEnemyHitCheck_Normal(cc_self, cc_other);
 }
 
@@ -457,6 +476,130 @@ bool Heiho::checkLedge() {
     return !bgChk.checkArea(&res, p0, p1, 1 << cDirType_Down);
 }
 
+void Heiho::landonEffect() {
+    if (!mHasLanded) {
+        // Either in the air or first frame of touching the ground
+        // Effect position
+        sead::Vector3f pos(
+            mPos.x,
+            mPos.y,
+            EFFECT_Z_POS_DEFAULT
+        );
+        // Check if we are touching the ground
+        if (mBgCheckObj.checkFoot()) {
+            // If we are, that means we've only started touching the ground on this frame, so we need to play a landing effect
+            pos.z = getEffectZPos();
+            // Set mHasLanded to true so the effect only plays the first frame we touch the ground
+            mHasLanded = true;
+            // Play different land effects depending on the type of ground we're landing on
+            switch (BgUnitCode::getAttr(mBgCheckObj.getBgCheckData(cDirType_Down))) {
+                default: // Normal ground
+                    EffectCreateUtil::createEffect(RP_Cmn_LandingSmoke_08, &pos);
+                    break;
+                case BgUnitCode::cNuma: // Beach sand
+                case BgUnitCode::cSand: // Desert sand
+                    EffectCreateUtil::createEffect(RP_Cmn_LandingSand_04, &pos);
+                    break;
+                case BgUnitCode::cIce:
+                    EffectCreateUtil::createEffect(RP_Cmn_LandingIce_04, &pos);
+                    break;
+                case BgUnitCode::cSnow:
+                    EffectCreateUtil::createEffect(RP_Cmn_LandingSnow_04, &pos);
+                    break;
+                case BgUnitCode::cWater: // Water geyser
+                    EffectCreateUtil::createEffect(RP_Cmn_LandingPillarWtr_04, &pos);
+                    break;
+            }
+        } else {
+            // Not touching the ground on this frame, check if we're entering liquid
+            sead::Vector3f check_pos = pos;
+            check_pos.y -= 2.0f;
+            // Check if we're inside liquid
+            WaterType water_type = ActorBgCollisionCheck::checkWater(&pos.y, check_pos, mLayer);
+            if (water_type != cWaterType_None) {
+                // If we are, that means we've only started touching the liquid on this frame, so we need to play a splash effect
+                // Set mHasLanded to true so the effect only plays the first frame we touch the liquid
+                mHasLanded = true;
+                pos.z = 6500.0f;
+                // Play different splash effects depending on the type of liquid we're landing on
+                switch (water_type) {
+                    default:
+                        break;
+                    case cWaterType_Water:
+                        splashEffect_(pos, RP_Cmn_WaterSplash_04, 6, "SE_OBJ_CMN_SPLASH");
+                        break;
+                    case cWaterType_Lava:
+                    case cWaterType_LavaWave:
+                        splashEffect_(pos, RP_Cmn_LavaSplash_04, 16, "SE_OBJ_CMN_SPLASH_LAVA");
+                        break;
+                    case cWaterType_Poison:
+                        splashEffect_(pos, RP_Cmn_PoisonSplash_04, 23, "SE_OBJ_CMN_SPLASH_POISON");
+                        break;
+                }
+            }
+        }
+    } else if (!mBgCheckObj.checkFoot()) {
+        // Currently in the air, set mHasLanded to false
+        mHasLanded = false;
+
+        // Check if we're in a liquid (but not touching the ground), and set mHasLanded to true
+        sead::Vector3f check_pos = mPos;
+        check_pos.y -= 2.0f;
+        WaterType water_type = ActorBgCollisionCheck::checkWater(nullptr, check_pos, mLayer);
+        if (water_type != cWaterType_None) {
+            mHasLanded = true;
+        }
+    }
+}
+
+// Check if inside a collider
+u8 Heiho::checkBgIn() {
+    bool pressUpDdown = false;
+    if (mBgCheckObj.checkFoot() && mBgCheckObj.checkHead()) {
+        pressUpDdown = true;
+    }
+
+    const sead::Vector3f& centerPos = getCenterPos();
+
+    const BgCollisionCheckParam param = {
+        ._0 = 0,
+        .ignore_quicksand = false,
+        .layer = mLayer,
+        .collision_mask = mCollisionMask,
+        .type = cBgCollisionCheckType_Solid,
+        .callback = nullptr
+    };
+    const sead::Vector2f checkPos(
+        centerPos.x,
+        centerPos.y
+    );
+    BasicBgCollisionCheck bgCheck(param);
+    bool bgIn = bgCheck.checkPoint(nullptr, checkPos);
+
+    s32 type = 0;
+    if (pressUpDdown && bgIn) {
+        type = 1;
+    }
+
+    return type;
+}
+
+// Kill the Shyguy due to being crushed
+void Heiho::setDeathInfo_Hasami() {
+    u8 dir = mPos.x - mPosPrev.x < 0.0f ? cDirType_Left : cDirType_Right;
+
+    hitdamageEffect(getPos2D());
+    GameAudio::getAudioObjEmy()->startSound("SE_EMY_DOWN", mPos);
+
+    ENEMY_MAKE_DEATH_INFO_ARG_FALL_NO_SCORE_NO_PLAYER(arg);
+    arg.speed.x = cDieFallInitSpeedX[dir];
+    arg.speed.y = cDieFallInitSpeedY;
+    arg.max_fall_speed = cDieFallMaxFallSpeed;
+    arg.gravity = cDieFallGravity;
+    arg.direction = dir;
+    mDeathInfo.kill(arg);
+}
+
 // Walk state
 void Heiho::initializeState_Walk() {
     // Play walk animation if not coming from Turn/Touch state
@@ -556,6 +699,8 @@ void Heiho::finalizeState_Sleep() { }
 
 // Jump state
 void Heiho::initializeState_Jump() {
+    mModel->setAnm("jump", 3.0f, FrameCtrl::cMode_NoRepeat, 0.6f);
+
     mJumpCounter = 0;
 
     // Set gravity
@@ -577,10 +722,6 @@ void Heiho::executeState_Jump() {
     }
 
     if (mBgCheckObj.checkFoot()) { // Touching the ground
-        // Landing effect
-        sead::Vector3f effectPos(mPos.x, mPos.y, 4500.0f);
-        EffectCreateUtil::createEffect(RP_Cmn_LandingSmoke_01, &effectPos);
-
         // Reset jump counter if landing from the 3rd bounce
         if (mJumpCounter == 3) {
             mJumpCounter = 0;
@@ -633,12 +774,13 @@ void Heiho::executeState_Dizzy() {
 
     // Play a dizzy star effect above the Shyguy
     f32 effectYOffset = mCenterOffset.y - (isOldState(StateID_Sleep) ? 56.0f : 53.0f);
-    sead::Vector3f effectPos(mPos.x, mPos.y + effectYOffset, 4500.0f);
+    sead::Vector3f effectPos(mPos.x, mPos.y + effectYOffset, EFFECT_Z_POS_DEFAULT);
     sead::Vector3f effectScale(0.5f, 0.5f, 0.5f);
     mDizzyEffect.createEffect(RP_BossKK_Piyori, &effectPos, nullptr, &effectScale);
 
-    // Go back to previous state after 600 frames and restore health
-    if (mTimer > 600) {
+    // Go back to previous state after some time and restore health
+    // Highest bit of mParam 1 shortens the dizzy time
+    if (mTimer > (mParam1 >> 31 & 1 ? 300 : 600)) {
         setInitialState(false);
         mHealth = 1;
     }
