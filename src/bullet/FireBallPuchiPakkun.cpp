@@ -1,4 +1,4 @@
-#include <propelpartsu/actor/FireBallPuchiPakkun.h>
+#include <propelpartsu/bullet/FireBallPuchiPakkun.h>
 #include <propelpartsu/PropelPartsU.h>
 #include <bullet/FireBallBros.h>
 #include <collision/ActorCollisionCheckMgr.h>

@@ -1,4 +1,4 @@
-#include <propelpartsu/actor/Heiho.h>
+#include <propelpartsu/enemy/Heiho.h>
 #include <propelpartsu/PropelPartsU.h>
 #include <collision/ActorCollisionCheckMgr.h>
 #include <utility/Mtx.h>

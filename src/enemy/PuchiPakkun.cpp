@@ -1,4 +1,4 @@
-#include <propelpartsu/actor/PuchiPakkun.h>
+#include <propelpartsu/enemy/PuchiPakkun.h>
 #include <propelpartsu/PropelPartsU.h>
 #include <game/FlagCtrl.h>
 #include <game_info/CourseInfo.h>
@@ -12,8 +12,8 @@
 #include <actor/ActorUtil.h>
 #include <input/InputMgr.h>
 #include <actor/ActorMgr.h>
-#include <propelpartsu/actor/FireBallPuchiPakkun.h>
-#include <propelpartsu/actor/IceBallPuchiPakkun.h>
+#include <propelpartsu/bullet/FireBallPuchiPakkun.h>
+#include <propelpartsu/bullet/IceBallPuchiPakkun.h>
 #include <map_obj/Freezer.h>
 
 namespace propelpartsu {
