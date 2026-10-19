@@ -54,4 +54,11 @@
       <entry value="13">15 Tiles</entry>
     </list>
   </sprite>
+
+  <sprite string_id="propelpartsu:itemkey" name="Item Key" notes="When collecting this key, it will fly up past the top-left corner of the screen near the Star Coin inventory and activate an event.">
+    <value nybble="1-2" title="Triggering Event ID" comment="The key will be hidden until this event is activated." category="events"/>
+		<value nybble="3-4" title="Target Event ID" comment="The event ID to activate upon collection." category="events"/>
+
+    <checkbox nybble="12" mask="1" title="Play Collect Effects" comment="When enabled, the Key will play a collect sound and have a golden sparkle trail when collected." category="behavior"/>
+  </sprite>
 </sprites>
