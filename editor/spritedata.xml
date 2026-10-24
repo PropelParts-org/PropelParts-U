@@ -61,4 +61,6 @@
 
     <checkbox nybble="12" mask="1" title="Play Collect Effects" comment="When enabled, the Key will play a collect sound and have a golden sparkle trail when collected." category="behavior"/>
   </sprite>
+
+  <sprite string_id="propelpartsu:bombbro" name="Bomb Bro." notes="A brother that throws Bob-ombs that will explode upon contact with anything."/>
 </sprites>
