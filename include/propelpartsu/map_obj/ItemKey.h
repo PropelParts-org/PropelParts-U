@@ -5,12 +5,14 @@
 #include <graphics/AnimModel.h>
 #include <effect/EffectObj.h>
 
+/*************************************************************************
+                Port of NSMBW's AC_SHIP_KEY Actor to NSMBU            
+*************************************************************************/
+
 namespace propelpartsu {
 
 class ItemKey : public ActorState {
     SEAD_RTTI_OVERRIDE(ItemKey, ActorState)
-protected:
-
 public:
     static Profile* sProfile;
 

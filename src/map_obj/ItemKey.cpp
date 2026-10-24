@@ -298,8 +298,8 @@ void ItemKey::executeState_UIJumpDemo() {
         mCollectEffect.createEffect(RP_CoinNormalTail, &effectPos, nullptr, &effectScale);
     }
 
-    float targetX = 0.0f;
-    float targetY = -16.0f;
+    f32 targetX = 0.0f;
+    f32 targetY = -16.0f;
 
     sead::Vector3f deltaPos(targetX - mPos.x, targetY - mPos.y, 0.0f);
     deltaPos.normalize();

@@ -89,8 +89,8 @@ const f32 Heiho::cMaxSpeedY = -4.0f;
 const f32 Heiho::cWalkSpeed[cDirType_NumX] = { 0.6f, -0.6f };
 
 static const ActorBgCollisionCheck::Sensor cBcSensorFoot = { -4.0f, 4.0f,  0.0f };
-static const ActorBgCollisionCheck::Sensor cBcSensorHead = {  0.0f, 0.0f, 20.0f };
-static const ActorBgCollisionCheck::Sensor cBcSensorWall = {  3.0f, 8.0f,  8.0f };
+static const ActorBgCollisionCheck::Sensor cBcSensorHead = { 0.0f, 0.0f, 20.0f };
+static const ActorBgCollisionCheck::Sensor cBcSensorWall = { 3.0f, 8.0f,  8.0f };
 
 Heiho::Heiho(const ActorCreateParam& param)
     : Enemy(param)
@@ -359,7 +359,7 @@ void Heiho::setInitialState(bool reset_pacer_dist) {
             if (reset_pacer_dist) {
                 // Set pacer final distances
                 if (mType == cHeihoType_Pace) {
-                    float finalOffset = 16.0f * mDistance - 8.0f;
+                    f32 finalOffset = 16.0f * mDistance - 8.0f;
                     mFinalPos[0] = mPos.x + finalOffset;
                     mFinalPos[1] = mPos.x - finalOffset;
                 }
@@ -545,9 +545,17 @@ void Heiho::landonEffect() {
         // Check if we're in a liquid (but not touching the ground), and set mHasLanded to true
         sead::Vector3f check_pos = mPos;
         check_pos.y -= 2.0f;
-        WaterType water_type = ActorBgCollisionCheck::checkWater(nullptr, check_pos, mLayer);
+        f32 surfacePos;
+        WaterType water_type = ActorBgCollisionCheck::checkWater(&surfacePos, check_pos, mLayer);
         if (water_type != cWaterType_None) {
             mHasLanded = true;
+            if (cWaterType_Quicksand > water_type && water_type > cWaterType_AirWater) {
+                // Submerged in poison or lava
+                if (getCenterPos().y < surfacePos) {
+                    // Kill if more than half submerged
+                    setSmokeDamage_(nullptr);
+                }
+            }
         }
     }
 }

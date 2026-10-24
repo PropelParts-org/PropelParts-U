@@ -110,8 +110,8 @@ const f32 PuchiPakkun::cMaxSpeedY = -4.0f;
 const f32 PuchiPakkun::cWalkSpeed[cDirType_NumX] = { 0.5f, -0.5f };
 
 static const ActorBgCollisionCheck::Sensor cBcSensorFoot = { -4.0f, 4.0f,  0.0f };
-static const ActorBgCollisionCheck::Sensor cBcSensorHead = {  0.0f, 0.0f, 16.0f };
-static const ActorBgCollisionCheck::Sensor cBcSensorWall = {  3.0f, 8.0f,  8.0f };
+static const ActorBgCollisionCheck::Sensor cBcSensorHead = { 0.0f, 0.0f, 16.0f };
+static const ActorBgCollisionCheck::Sensor cBcSensorWall = { 3.0f, 8.0f,  8.0f };
 
 PuchiPakkun::PuchiPakkun(const ActorCreateParam& param)
     : Enemy(param)
@@ -473,9 +473,17 @@ void PuchiPakkun::landonEffect() {
         // Check if we're in a liquid (but not touching the ground), and set mHasLanded to true
         sead::Vector3f check_pos = mPos;
         check_pos.y -= 2.0f;
-        WaterType water_type = ActorBgCollisionCheck::checkWater(nullptr, check_pos, mLayer);
+        f32 surfacePos;
+        WaterType water_type = ActorBgCollisionCheck::checkWater(&surfacePos, check_pos, mLayer);
         if (water_type != cWaterType_None) {
             mHasLanded = true;
+            if (cWaterType_Quicksand > water_type && water_type > cWaterType_AirWater) {
+                // Submerged in poison or lava
+                if (getCenterPos().y < surfacePos) {
+                    // Kill if more than half submerged
+                    setSmokeDamage_(nullptr);
+                }
+            }
         }
     }
 }
@@ -513,7 +521,7 @@ bool PuchiPakkun::isPlayerInFireRange() {
 }
 
 // Set the distance for the fireball to travel based on Player distance
-void PuchiPakkun::setFireDistance(float distance) {
+void PuchiPakkun::setFireDistance(f32 distance) {
     if (distance >= 65.0f) {
         mFireDist = 4;
     } else if (distance >= 49.0f) {

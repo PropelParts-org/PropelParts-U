@@ -60,7 +60,7 @@ public:
     void landonEffect();
     bool isPlayerAbove();
     bool isPlayerInFireRange();
-    void setFireDistance(float distance);
+    void setFireDistance(f32 distance);
     u8 checkBgIn();
     void setDeathInfo_Hasami();
 
